@@ -25,7 +25,7 @@ class MyDecorator : InterceptingDecorator<IMyService>
     {
         // Do things here before you execute the call
         Console.WriteLine($"Before calling {call.Method.Name}");
-        
+
         var returnValue = call.Continue();
 
         // Do things here after you execute the call
@@ -44,4 +44,8 @@ var proxyType = proxyGenerator.GenerateProxy<IMyService, MyDecorator>();
 // Register the proxy as a decorator in e.g. SimpleInjector
 container.Register<IMyService, MyService>();
 container.RegisterDecorator(typeof(IMyService), proxyType);
+
+// Or create an instance of the proxy and use it directly
+var instance = proxyGenerator.CreateProxy<IMyService, MyDecorator>();
+instance.MyMethod();
 ```
