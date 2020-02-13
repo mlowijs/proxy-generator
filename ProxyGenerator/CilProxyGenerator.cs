@@ -54,6 +54,14 @@ namespace ProxyGenerator
             return type;
         }
 
+        public TService CreateProxy<TService, TProxy>(params object[] args)
+            where TProxy : InterceptingDecorator<TService>
+        {
+            var type = GenerateProxy<TService, TProxy>();
+
+            return (TService)Activator.CreateInstance(type, args);
+        }
+
         private TypeBuilder GetTypeBuilder(Type serviceType, Type proxyType)
         {
             return _moduleBuilder.DefineType($"{serviceType.Name}_proxy",
@@ -105,11 +113,8 @@ namespace ProxyGenerator
 
             var ilGenerator = methodBuilder.GetILGenerator();
 
-            // --- Method generation starts here ---
             ilGenerator.Emit(OpCodes.Ldarg_0); // Load "this" for Invoke call
-
-            // Load "methodIndex": var methodInfo = this.MethodInfos[methodIndex];
-            ilGenerator.Emit(OpCodes.Ldc_I4, methodIndex); // Load array index onto the stack
+            ilGenerator.Emit(OpCodes.Ldc_I4, methodIndex); // Load "methodIndex" for Invoke call
 
             // Create args array: var args = new object[parameters.Length];
             ilGenerator.Emit(OpCodes.Ldc_I4, parameters.Length); // Load parameter count
@@ -151,7 +156,7 @@ namespace ProxyGenerator
             }
             else
             {
-                ilGenerator.Emit(OpCodes.Ldnull);
+                ilGenerator.Emit(OpCodes.Ldnull); // Load null onto the stack
             }
 
             // Call: this.Invoke(methodIndex, args, typeArgs);
