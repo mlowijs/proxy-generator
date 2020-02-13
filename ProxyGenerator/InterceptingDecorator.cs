@@ -28,6 +28,11 @@ namespace ProxyGenerator
             return Intercept(call);
         }
         
+        /// <summary>
+        /// Intercepts a method call.
+        /// </summary>
+        /// <param name="call">An object containing information about the method call.</param>
+        /// <returns>The return value of the Continue call.</returns>
         protected abstract object Intercept(ICall call);
     }
 }
