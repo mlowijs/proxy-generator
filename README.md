@@ -35,17 +35,19 @@ class MyDecorator : InterceptingDecorator<IMyService>
     }
 }
 
-// ...
+// Startup.cs (SimpleInjector example, inject IMyService whereever you need it)
+//
+// SimpleInjector handles injecting the concrete MyService into the generated proxy
+// through the RegisterDecorator mechanism
+container.Register<IMyService, MyService>();
 
-IProxyGenerator proxyGenerator = new CilProxyGenerator();
-
+var proxyGenerator = new CilProxyGenerator();
 var proxyType = proxyGenerator.GenerateProxy<IMyService, MyDecorator>();
 
-// Register the proxy as a decorator in e.g. SimpleInjector
-container.Register<IMyService, MyService>();
 container.RegisterDecorator(typeof(IMyService), proxyType);
 
-// Or create an instance of the proxy and use it directly
-var instance = proxyGenerator.CreateProxy<IMyService, MyDecorator>();
-instance.MyMethod();
+// ... or create an instance of the proxy directly, if required
+var proxyGenerator = new CilProxyGenerator();
+var myService = proxyGenerator.CreateProxy<IMyService, MyDecorator>(new MyService());
+myService.MyMethod();
 ```
