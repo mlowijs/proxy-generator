@@ -2,7 +2,7 @@
 
 namespace ProxyGenerator
 {
-    public class Call : ICall
+    internal class Call : ICall
     {
         private readonly object _instance;
 

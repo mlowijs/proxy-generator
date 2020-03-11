@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 
 namespace ProxyGenerator
@@ -21,7 +22,7 @@ namespace ProxyGenerator
         {
             var methodInfo = _methodInfos[methodIndex];
 
-            if (typeArgs != null)
+            if (typeArgs.Any())
                 methodInfo = methodInfo.MakeGenericMethod(typeArgs);
 
             var call = new Call(_service, methodInfo, args);

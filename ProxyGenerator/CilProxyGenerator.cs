@@ -19,10 +19,10 @@ namespace ProxyGenerator
 
         public CilProxyGenerator()
         {
-            _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("CilServiceProxyAssembly"),
+            _assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName("ProxyGeneratorAssembly"),
                 AssemblyBuilderAccess.Run);
             
-            _moduleBuilder = _assemblyBuilder.DefineDynamicModule("CilServiceProxyModule");
+            _moduleBuilder = _assemblyBuilder.DefineDynamicModule("ProxyGeneratorModule");
         }
         
         public Type GenerateProxy<TService, TProxy>()
@@ -136,27 +136,20 @@ namespace ProxyGenerator
                 ilGenerator.Emit(OpCodes.Stelem_Ref); // Store argument into the array: args[i] = arg;
             }
             
-            if (methodInfo.IsGenericMethod)
-            {
-                var genericParameters = methodInfo.GetGenericArguments();
+            var genericParameters = methodInfo.GetGenericArguments();
                 
-                // Create type args array: var typeArgs = new Type[genericParameters.Length];
-                ilGenerator.Emit(OpCodes.Ldc_I4, genericParameters.Length); // Load parameter count
-                ilGenerator.Emit(OpCodes.Newarr, typeof(Type)); // Create new Type[] on the stack
-
-                // Put the type args into the array: typeArgs[0] = typeof(TArg0); typeArgs[1] = typeof(TArg1); ...etc
-                for (var i = 0; i < genericParameters.Length; i++)
-                {
-                    ilGenerator.Emit(OpCodes.Dup); // Duplicate typeArgs reference
-                    ilGenerator.Emit(OpCodes.Ldc_I4, i); // Load array index
-                    ilGenerator.Emit(OpCodes.Ldtoken, genericParameters[i]); // Load type handle
-                    ilGenerator.Emit(OpCodes.Call, GetTypeFromHandleMethod); // Get type from handle and load
-                    ilGenerator.Emit(OpCodes.Stelem_Ref); // Store argument into the array: typeArgs[i] = typeof(T);
-                }
-            }
-            else
+            // Create type args array: var typeArgs = new Type[genericParameters.Length];
+            ilGenerator.Emit(OpCodes.Ldc_I4, genericParameters.Length); // Load parameter count
+            ilGenerator.Emit(OpCodes.Newarr, typeof(Type)); // Create new Type[] on the stack
+            
+            // Put the type args into the array: typeArgs[0] = typeof(TArg0); typeArgs[1] = typeof(TArg1); ...etc
+            for (var i = 0; i < genericParameters.Length; i++)
             {
-                ilGenerator.Emit(OpCodes.Ldnull); // Load null onto the stack
+                ilGenerator.Emit(OpCodes.Dup); // Duplicate typeArgs reference
+                ilGenerator.Emit(OpCodes.Ldc_I4, i); // Load array index
+                ilGenerator.Emit(OpCodes.Ldtoken, genericParameters[i]); // Load type handle
+                ilGenerator.Emit(OpCodes.Call, GetTypeFromHandleMethod); // Get type from handle and load
+                ilGenerator.Emit(OpCodes.Stelem_Ref); // Store argument into the array: typeArgs[i] = typeof(T);
             }
 
             // Call: this.Invoke(methodIndex, args, typeArgs);
