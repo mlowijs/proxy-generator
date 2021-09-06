@@ -17,9 +17,11 @@ namespace ProxyGenerator
         public MethodInfo Method { get; }
         public object[] Arguments { get; }
 
-        public object Continue()
+        public ICallResult Continue()
         {
-            return Method.Invoke(_instance, Arguments);
+            var result = Method.Invoke(_instance, Arguments);
+            
+            return new CallResult(result);
         }
     }
 }

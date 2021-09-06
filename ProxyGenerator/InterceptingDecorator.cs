@@ -26,14 +26,14 @@ namespace ProxyGenerator
                 methodInfo = methodInfo.MakeGenericMethod(typeArgs);
 
             var call = new Call(_service, methodInfo, args);
-            return Intercept(call);
+            return Intercept(call).ReturnValue;
         }
         
         /// <summary>
         /// Intercepts a method call.
         /// </summary>
         /// <param name="call">An object containing information about the method call.</param>
-        /// <returns>The return value of the Continue call.</returns>
-        protected abstract object Intercept(ICall call);
+        /// <returns>The return value of the Continue method.</returns>
+        protected abstract ICallResult Intercept(ICall call);
     }
 }

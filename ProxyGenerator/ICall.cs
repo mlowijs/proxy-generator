@@ -16,7 +16,7 @@ namespace ProxyGenerator
         /// <summary>
         /// Executes the original method call and returns its return value.
         /// </summary>
-        /// <returns>The return value of the original method call.</returns>
-        object Continue();
+        /// <returns>An <see cref="ICallResult"/> containing the return value of the original method call.</returns>
+        ICallResult Continue();
     }
 }
